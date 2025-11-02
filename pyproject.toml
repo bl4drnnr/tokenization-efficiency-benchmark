@@ -1,0 +1,20 @@
+[project]
+name = "tokenization-efficiency-benchmark"
+version = "0.1.0"
+description = "Transformer language models for Polish text"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datasets>=4.2.0",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "speakleash>=0.3.51",
+    "tokenizers>=0.22.1",
+    "torch>=2.9.0",
+    "tqdm>=4.67.1",
+]
+
+[tool.uv.workspace]
+members = [
+    "lo-rnn-transformer-tokenizers",
+]

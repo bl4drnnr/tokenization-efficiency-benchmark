@@ -1,0 +1,41 @@
+# IDE and environment
+.idea/
+.venv/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+
+# Data files (keep structure, ignore content)
+data/raw/*.txt
+data/raw/*.jsonl
+data/raw/*.json
+data/processed/*.pt
+data/processed/*.json
+data/wikipedia/*.txt
+data/wikipedia/*.jsonl
+
+# Model checkpoints
+checkpoints/*.pt
+checkpoints/*.pth
+
+# Results
+results/*.txt
+results/*.png
+results/*.json
+results/*.csv
+results/plots/*.png
+
+CLAUDE.md
+.claude/
+speakleash_datasets_metadata/*
+LAB_INSTRUCTIONS.md
+

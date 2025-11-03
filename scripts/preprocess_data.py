@@ -12,12 +12,13 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.config import get_config
-from utils.tokenizer import PolishTokenizer
+from utils.tokenizer_factory import create_tokenizer, get_tokenizer_name
 from utils.dataset import load_text_file, load_jsonl_file, split_data
 
 
 def preprocess_data(
     input_file: Path,
+    tokenizer_type: str = "bpe",
     file_type: str = "txt",
     text_field: str = "text",
 ):
@@ -26,6 +27,7 @@ def preprocess_data(
 
     Args:
         input_file: Path to input data file
+        tokenizer_type: Type of tokenizer ('bpe', 'whitespace', or 'sentencepiece')
         file_type: Type of input file ('txt' or 'jsonl')
         text_field: Field name for JSONL files
     """
@@ -40,6 +42,7 @@ def preprocess_data(
     config = get_config("transformer")
     config.dataset_name = dataset_name
     print(f"\nDataset: {dataset_name}")
+    print(f"Tokenizer: {get_tokenizer_name(tokenizer_type)}")
     print(f"Configuration: {config}")
     print(f"Device: {config.device}")
 
@@ -68,11 +71,11 @@ def preprocess_data(
 
     # Train tokenizer on training data
     print(f"\nTraining tokenizer (vocab_size={config.vocab_size})...")
-    tokenizer = PolishTokenizer(vocab_size=config.vocab_size)
+    tokenizer = create_tokenizer(tokenizer_type, vocab_size=config.vocab_size)
     tokenizer.train(train_texts)
 
-    # Save tokenizer
-    tokenizer_path = config.data_processed_dir / f"{dataset_name}_tokenizer.json"
+    # Save tokenizer (include tokenizer type in filename)
+    tokenizer_path = config.data_processed_dir / f"{dataset_name}_{tokenizer_type}_tokenizer.json"
     tokenizer.save(tokenizer_path)
 
     # Tokenize all splits
@@ -106,15 +109,16 @@ def preprocess_data(
     print(f"  Val avg length: {avg_val_len:.1f} tokens")
     print(f"  Test avg length: {avg_test_len:.1f} tokens")
 
-    # Save tokenized data
+    # Save tokenized data (include tokenizer type in filename)
     print("\nSaving preprocessed data...")
-    torch.save(train_ids, config.data_processed_dir / f"{dataset_name}_train_ids.pt")
-    torch.save(val_ids, config.data_processed_dir / f"{dataset_name}_val_ids.pt")
-    torch.save(test_ids, config.data_processed_dir / f"{dataset_name}_test_ids.pt")
+    torch.save(train_ids, config.data_processed_dir / f"{dataset_name}_{tokenizer_type}_train_ids.pt")
+    torch.save(val_ids, config.data_processed_dir / f"{dataset_name}_{tokenizer_type}_val_ids.pt")
+    torch.save(test_ids, config.data_processed_dir / f"{dataset_name}_{tokenizer_type}_test_ids.pt")
 
     # Save metadata
     metadata = {
         "dataset_name": dataset_name,
+        "tokenizer_type": tokenizer_type,
         "num_train": len(train_ids),
         "num_val": len(val_ids),
         "num_test": len(test_ids),
@@ -129,7 +133,7 @@ def preprocess_data(
     }
 
     import json
-    with open(config.data_processed_dir / f"{dataset_name}_metadata.json", "w") as f:
+    with open(config.data_processed_dir / f"{dataset_name}_{tokenizer_type}_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
 
     print("\nPreprocessing complete!")
@@ -145,6 +149,13 @@ def main():
         type=str,
         required=True,
         help="Path to input data file",
+    )
+    parser.add_argument(
+        "--tokenizer",
+        type=str,
+        default="bpe",
+        choices=["bpe", "whitespace", "sentencepiece"],
+        help="Type of tokenizer to use (bpe, whitespace, or sentencepiece)",
     )
     parser.add_argument(
         "--file-type",
@@ -169,6 +180,7 @@ def main():
 
     preprocess_data(
         input_file=input_path,
+        tokenizer_type=args.tokenizer,
         file_type=args.file_type,
         text_field=args.text_field,
     )

@@ -8,6 +8,7 @@ dependencies = [
     "datasets>=4.2.0",
     "matplotlib>=3.10.7",
     "numpy>=2.3.4",
+    "sentencepiece>=0.2.0",
     "speakleash>=0.3.51",
     "tokenizers>=0.22.1",
     "torch>=2.9.0",

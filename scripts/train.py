@@ -155,7 +155,16 @@ def train(
         print(f"\nAuto-detected dataset: {dataset}")
 
     config.dataset_name = dataset
+
+    # Load metadata to get tokenizer type
+    metadata_path = config.data_processed_dir / f"{dataset}_metadata.json"
+    with open(metadata_path, "r") as f:
+        metadata = json.load(f)
+        pad_token_id = metadata["pad_token_id"]
+        tokenizer_type = metadata.get("tokenizer_type", "bpe")  # Default to bpe for old datasets
+
     print(f"Dataset: {dataset}")
+    print(f"Tokenizer: {tokenizer_type}")
     print(f"Configuration: {config}")
     print(f"Device: {config.device}")
 
@@ -164,10 +173,6 @@ def train(
     train_ids = torch.load(config.data_processed_dir / f"{dataset}_train_ids.pt")
     val_ids = torch.load(config.data_processed_dir / f"{dataset}_val_ids.pt")
     test_ids = torch.load(config.data_processed_dir / f"{dataset}_test_ids.pt")
-
-    with open(config.data_processed_dir / f"{dataset}_metadata.json", "r") as f:
-        metadata = json.load(f)
-        pad_token_id = metadata["pad_token_id"]
 
     print(f"Train: {len(train_ids)} | Val: {len(val_ids)} | Test: {len(test_ids)}")
 
@@ -233,8 +238,8 @@ def train(
     # Metrics tracker
     metrics = MetricsTracker()
 
-    # Initialize plotter with dataset-specific model name
-    model_name_with_dataset = f"{dataset}_transformer"
+    # Initialize plotter with dataset and tokenizer-specific model name
+    model_name_with_dataset = f"{dataset}_{tokenizer_type}_transformer"
     plotter = TrainingPlotter(save_dir=config.results_dir, model_name=model_name_with_dataset)
 
     # Resume from checkpoint if specified
@@ -304,7 +309,7 @@ def train(
 
         # Save checkpoint
         if (epoch + 1) % config.save_every_n_epochs == 0 or val_loss < best_val_loss:
-            checkpoint_path = config.checkpoints_dir / f"{dataset}_transformer_epoch_{epoch + 1}.pt"
+            checkpoint_path = config.checkpoints_dir / f"{dataset}_{tokenizer_type}_transformer_epoch_{epoch + 1}.pt"
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
@@ -312,13 +317,14 @@ def train(
                 'train_loss': train_loss,
                 'val_loss': val_loss,
                 'config': config,
+                'tokenizer_type': tokenizer_type,
             }, checkpoint_path)
             print(f"  Checkpoint saved: {checkpoint_path}")
 
         # Save best model
         if val_loss < best_val_loss:
             best_val_loss = val_loss
-            best_model_path = config.checkpoints_dir / f"{dataset}_transformer_best.pt"
+            best_model_path = config.checkpoints_dir / f"{dataset}_{tokenizer_type}_transformer_best.pt"
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
@@ -326,6 +332,7 @@ def train(
                 'train_loss': train_loss,
                 'val_loss': val_loss,
                 'config': config,
+                'tokenizer_type': tokenizer_type,
             }, best_model_path)
             print(f"  Best model saved: {best_model_path}")
 
@@ -341,7 +348,7 @@ def train(
     print(f"Best validation perplexity: {calculate_perplexity(best_val_loss):.2f}")
 
     # Save metrics
-    metrics_path = config.results_dir / f"{dataset}_transformer_metrics.json"
+    metrics_path = config.results_dir / f"{dataset}_{tokenizer_type}_transformer_metrics.json"
     metrics.save(str(metrics_path))
 
     # Create final summary plot

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Union
 from utils.tokenizer import PolishTokenizer  # BPE tokenizer
 from utils.whitespace_tokenizer import WhitespaceTokenizer
+from utils.sentencepiece_tokenizer import SentencePieceTokenizer
 
 
 def create_tokenizer(tokenizer_type: str, vocab_size: int = 10000):
@@ -30,8 +31,7 @@ def create_tokenizer(tokenizer_type: str, vocab_size: int = 10000):
     elif tokenizer_type == "whitespace":
         return WhitespaceTokenizer(vocab_size=vocab_size)
     elif tokenizer_type == "sentencepiece":
-        # TODO: Implement SentencePiece tokenizer
-        raise NotImplementedError("SentencePiece tokenizer not yet implemented")
+        return SentencePieceTokenizer(vocab_size=vocab_size, model_type="bpe")
     else:
         raise ValueError(
             f"Unknown tokenizer type: {tokenizer_type}. "
@@ -64,11 +64,13 @@ def load_tokenizer(tokenizer_path: Path, tokenizer_type: str = None):
 
             if tokenizer_type is None:
                 # BPE tokenizer doesn't have 'type' field
-                # Check for BPE-specific fields
+                # Check for tokenizer-specific fields
                 if 'model' in data and 'vocab' in data:
                     tokenizer_type = 'bpe'
                 elif 'word_to_id' in data:
                     tokenizer_type = 'whitespace'
+                elif 'model_file' in data:
+                    tokenizer_type = 'sentencepiece'
         except Exception:
             # Default to BPE if can't determine
             tokenizer_type = 'bpe'
@@ -83,8 +85,9 @@ def load_tokenizer(tokenizer_path: Path, tokenizer_type: str = None):
         tokenizer.load(tokenizer_path)
         return tokenizer
     elif tokenizer_type.lower() == "sentencepiece":
-        # TODO: Implement SentencePiece loading
-        raise NotImplementedError("SentencePiece tokenizer not yet implemented")
+        tokenizer = SentencePieceTokenizer()
+        tokenizer.load(tokenizer_path)
+        return tokenizer
     else:
         raise ValueError(f"Unknown tokenizer type: {tokenizer_type}")
 

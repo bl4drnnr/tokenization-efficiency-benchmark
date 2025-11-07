@@ -26,6 +26,7 @@ data/wikipedia/*.jsonl
 # Model checkpoints
 checkpoints/*.pt
 checkpoints/*.pth
+*.model
 
 # Results
 results/*.txt
@@ -39,4 +40,5 @@ CLAUDE.md
 speakleash_datasets_metadata/*
 LAB_INSTRUCTIONS.md
 PREVIOUS_README.md
+
 

@@ -18,7 +18,7 @@ from utils.dataset import load_text_file, load_jsonl_file, split_data
 
 def preprocess_data(
     input_file: Path,
-    tokenizer_type: str = "bpe",
+    tokenizer_type: str = "gpt2",
     file_type: str = "txt",
     text_field: str = "text",
 ):
@@ -27,7 +27,7 @@ def preprocess_data(
 
     Args:
         input_file: Path to input data file
-        tokenizer_type: Type of tokenizer ('bpe', 'whitespace', or 'sentencepiece')
+        tokenizer_type: Type of tokenizer ('gpt2', 'whitespace', or 'sentencepiece')
         file_type: Type of input file ('txt' or 'jsonl')
         text_field: Field name for JSONL files
     """
@@ -153,9 +153,9 @@ def main():
     parser.add_argument(
         "--tokenizer",
         type=str,
-        default="bpe",
-        choices=["bpe", "whitespace", "sentencepiece"],
-        help="Type of tokenizer to use (bpe, whitespace, or sentencepiece)",
+        default="gpt2",
+        choices=["gpt2", "whitespace", "sentencepiece"],
+        help="Type of tokenizer to use (gpt2, whitespace, or sentencepiece)",
     )
     parser.add_argument(
         "--file-type",

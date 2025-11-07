@@ -167,7 +167,7 @@ def qualitative_analysis(tokenizer, tokenizer_type: str, sample_texts: List[str]
 
 def compare_tokenizers(
     dataset: str,
-    tokenizer_types: List[str] = ["bpe", "whitespace", "sentencepiece"],
+    tokenizer_types: List[str] = ["gpt2", "whitespace", "sentencepiece"],
     data_type: str = "test"
 ):
     """
@@ -195,7 +195,7 @@ def compare_tokenizers(
         # Load tokenizer and data
         tokenizer_path = config.data_processed_dir / f"{dataset}_{tok_type}_tokenizer.json"
         if not tokenizer_path.exists():
-            print(f"⚠️  Tokenizer not found: {tokenizer_path}")
+            print(f"  Tokenizer not found: {tokenizer_path}")
             print(f"   Run: python scripts/preprocess_data.py --input data/raw/your_data.txt --tokenizer {tok_type}")
             continue
 
@@ -206,7 +206,7 @@ def compare_tokenizers(
         # Load model checkpoint
         checkpoint_path = config.checkpoints_dir / f"{dataset}_{tok_type}_transformer_best.pt"
         if not checkpoint_path.exists():
-            print(f"⚠️  Model checkpoint not found: {checkpoint_path}")
+            print(f"  Model checkpoint not found: {checkpoint_path}")
             print(f"   Run: python scripts/train.py --dataset {dataset}_{tok_type}")
             continue
 
@@ -239,7 +239,7 @@ def compare_tokenizers(
             test_size = int(len(all_texts) * 0.05)
             original_test_texts = all_texts[-test_size:]
         else:
-            print("⚠️  Original text file not found, skipping word/char perplexity")
+            print("  Original text file not found, skipping word/char perplexity")
             original_test_texts = []
 
         # Create dataloader

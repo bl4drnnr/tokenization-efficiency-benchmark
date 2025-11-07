@@ -1,6 +1,6 @@
 """
 Configuration file for Transformer language model.
-Optimized for Mac (MPS/CPU) training.
+Supports GPU (CUDA), Apple Silicon (MPS), and CPU training.
 """
 
 import torch
@@ -23,11 +23,15 @@ class Config:
     checkpoints_dir: Path = project_root / "checkpoints"
     results_dir: Path = project_root / "results"
 
-    # Device configuration (Mac-optimized)
-    device: str = "mps" if torch.backends.mps.is_available() else "cpu"
+    # Device configuration (GPU -> MPS -> CPU hierarchy)
+    device: str = (
+        "cuda" if torch.cuda.is_available()
+        else "mps" if torch.backends.mps.is_available()
+        else "cpu"
+    )
 
     # Data processing
-    vocab_size: int = 10000  # Small vocab for Mac training
+    vocab_size: int = 10000  # For whitespace and sentencepiece tokenizers (GPT-2 uses 50,257)
     max_seq_length: int = 128  # Shorter sequences for faster training
     train_split: float = 0.85
     val_split: float = 0.10
@@ -37,7 +41,7 @@ class Config:
     min_frequency: int = 2  # Minimum token frequency to include in vocab
 
     # Training hyperparameters
-    batch_size: int = 32  # Small batch size for Mac
+    batch_size: int = 32  # Adjust based on available GPU memory
     num_epochs: int = 20  # Increased from 10 (transformers need more epochs)
     learning_rate: float = 3e-4  # Reduced from 1e-3 (transformers need lower LR)
     weight_decay: float = 0.01

@@ -65,9 +65,17 @@ def train_epoch(
     pad_token_id: int,
     gradient_clip: float = 1.0,
     scheduler=None,
+    use_amp: bool = False,
+    gradient_accumulation_steps: int = 1,
+    scaler=None,
 ) -> float:
     """
     Train for one epoch.
+
+    Args:
+        use_amp: Use automatic mixed precision training
+        gradient_accumulation_steps: Number of steps to accumulate gradients
+        scaler: GradScaler for mixed precision training
 
     Returns:
         Average loss for the epoch
@@ -78,46 +86,59 @@ def train_epoch(
 
     progress_bar = tqdm(dataloader, desc="Training")
 
-    for inputs, targets in progress_bar:
+    for batch_idx, (inputs, targets) in enumerate(progress_bar):
         inputs = inputs.to(device)
         targets = targets.to(device)
 
-        # Zero gradients
-        optimizer.zero_grad()
+        # Forward pass with mixed precision
+        with torch.amp.autocast(device_type='cuda' if device == 'cuda' else 'cpu', enabled=use_amp):
+            outputs = model(inputs)
 
-        # Forward pass
-        outputs = model(inputs)
+            # Calculate loss (ignore padding tokens)
+            batch_size, seq_len, vocab_size = outputs.shape
+            outputs_flat = outputs.reshape(-1, vocab_size)
+            targets_flat = targets.reshape(-1)
 
-        # Calculate loss (ignore padding tokens)
-        batch_size, seq_len, vocab_size = outputs.shape
-        outputs_flat = outputs.reshape(-1, vocab_size)
-        targets_flat = targets.reshape(-1)
+            mask = (targets_flat != pad_token_id)
+            loss = criterion(outputs_flat[mask], targets_flat[mask])
 
-        mask = (targets_flat != pad_token_id)
-        loss = criterion(outputs_flat[mask], targets_flat[mask])
+            # Scale loss for gradient accumulation
+            loss = loss / gradient_accumulation_steps
 
         # Backward pass
-        loss.backward()
+        if use_amp and scaler is not None:
+            scaler.scale(loss).backward()
+        else:
+            loss.backward()
 
-        # Gradient clipping
-        torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip)
+        # Update weights every gradient_accumulation_steps
+        if (batch_idx + 1) % gradient_accumulation_steps == 0:
+            if use_amp and scaler is not None:
+                # Gradient clipping with scaled gradients
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip)
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad()
+            else:
+                # Gradient clipping
+                torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clip)
+                optimizer.step()
+                optimizer.zero_grad()
 
-        # Update weights
-        optimizer.step()
+            # Update learning rate (for warmup)
+            if scheduler is not None:
+                scheduler.step()
 
-        # Update learning rate (for warmup)
-        if scheduler is not None:
-            scheduler.step()
-
-        # Track statistics
+        # Track statistics (use unscaled loss)
         num_tokens = mask.sum().item()
-        total_loss += loss.item() * num_tokens
+        total_loss += loss.item() * gradient_accumulation_steps * num_tokens
         total_tokens += num_tokens
 
         # Update progress bar
         current_lr = optimizer.param_groups[0]['lr']
         progress_bar.set_postfix({
-            "loss": f"{loss.item():.4f}",
+            "loss": f"{loss.item() * gradient_accumulation_steps:.4f}",
             "lr": f"{current_lr:.2e}"
         })
 
@@ -169,6 +190,14 @@ def train(
     print(f"Vocabulary size: {vocab_size}")
     print(f"Configuration: {config}")
     print(f"Device: {config.device}")
+    print(f"Training environment: {config.training_env}")
+    if config.device == "cuda":
+        print(f"GPU: {torch.cuda.get_device_name(0)}")
+        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+    print(f"Mixed precision (AMP): {config.use_amp}")
+    print(f"Gradient accumulation steps: {config.gradient_accumulation_steps}")
+    print(f"DataLoader workers: {config.num_workers}")
+    print(f"Pin memory: {config.pin_memory}")
 
     # Load preprocessed data
     print("\nLoading preprocessed data...")
@@ -187,7 +216,8 @@ def train(
         batch_size=config.batch_size,
         max_length=config.max_seq_length,
         pad_token_id=pad_token_id,
-        num_workers=0,  # Mac-friendly
+        num_workers=config.num_workers,
+        pin_memory=config.pin_memory,
     )
 
     # Create model
@@ -237,6 +267,11 @@ def train(
 
     print(f"Learning rate warmup: {config.warmup_steps} steps")
 
+    # Create GradScaler for mixed precision training
+    scaler = torch.amp.GradScaler('cuda', enabled=config.use_amp) if config.device == 'cuda' else None
+    if config.use_amp:
+        print(f"Mixed precision training enabled with GradScaler")
+
     # Metrics tracker
     metrics = MetricsTracker()
 
@@ -278,6 +313,9 @@ def train(
             pad_token_id,
             config.gradient_clip,
             scheduler=scheduler,  # Pass scheduler for warmup
+            use_amp=config.use_amp,
+            gradient_accumulation_steps=config.gradient_accumulation_steps,
+            scaler=scaler,
         )
 
         # Validate
@@ -308,6 +346,12 @@ def train(
         print(f"  Train Loss: {train_loss:.4f} | Train PPL: {train_ppl:.2f}")
         print(f"  Val Loss:   {val_loss:.4f} | Val PPL:   {val_ppl:.2f}")
         print(f"  LR: {current_lr:.6f} | Time: {epoch_time:.1f}s")
+
+        # GPU memory usage
+        if config.device == "cuda":
+            gpu_mem_allocated = torch.cuda.memory_allocated(0) / 1e9
+            gpu_mem_reserved = torch.cuda.memory_reserved(0) / 1e9
+            print(f"  GPU Memory: {gpu_mem_allocated:.2f}GB allocated, {gpu_mem_reserved:.2f}GB reserved")
 
         # Save checkpoint
         if (epoch + 1) % config.save_every_n_epochs == 0 or val_loss < best_val_loss:

@@ -107,12 +107,12 @@ class Config:
                 # Cloud GPU optimization (RunPod, Colab, etc.)
                 self.num_workers = 8  # More workers for cloud GPUs
                 if self.batch_size <= 64:  # Only increase if using default/small batch
-                    # Increase batch size to use more VRAM = faster training
-                    self.batch_size = 256  # Increased from 128 to use available VRAM
-                    self.gradient_accumulation_steps = 2  # Effective batch = 256 * 2 = 512
+                    # Optimized batch size to maximize VRAM without OOM
+                    self.batch_size = 192  # Sweet spot for 50M model on RTX 5090
+                    self.gradient_accumulation_steps = 2  # Effective batch = 192 * 2 = 384
 
                     # Scale learning rate with effective batch size
-                    # Effective batch = 256 * 2 = 512
+                    # Effective batch = 192 * 2 = 384
                     if self.learning_rate == 3e-4:
                         effective_batch = self.batch_size * self.gradient_accumulation_steps
                         self.learning_rate = 3e-4 * (effective_batch / 32)

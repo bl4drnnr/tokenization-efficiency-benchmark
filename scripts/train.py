@@ -156,15 +156,17 @@ def train(
 
     config.dataset_name = dataset
 
-    # Load metadata to get tokenizer type
+    # Load metadata to get tokenizer type and vocab size
     metadata_path = config.data_processed_dir / f"{dataset}_metadata.json"
     with open(metadata_path, "r") as f:
         metadata = json.load(f)
         pad_token_id = metadata["pad_token_id"]
+        vocab_size = metadata["vocab_size"]  # Use actual vocab size from tokenizer
         tokenizer_type = metadata.get("tokenizer_type", "bpe")  # Default to bpe for old datasets
 
     print(f"Dataset: {dataset}")
     print(f"Tokenizer: {tokenizer_type}")
+    print(f"Vocabulary size: {vocab_size}")
     print(f"Configuration: {config}")
     print(f"Device: {config.device}")
 
@@ -191,7 +193,7 @@ def train(
     # Create model
     print("\nInitializing model...")
     model = TransformerLanguageModel(
-        vocab_size=config.vocab_size,
+        vocab_size=vocab_size,  # Use vocab_size from metadata (not config)
         d_model=config.embedding_dim,
         num_heads=config.num_heads,
         num_layers=config.num_layers,

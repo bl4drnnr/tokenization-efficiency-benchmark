@@ -122,7 +122,7 @@ def preprocess_data(
         "num_train": len(train_ids),
         "num_val": len(val_ids),
         "num_test": len(test_ids),
-        "vocab_size": config.vocab_size,
+        "vocab_size": tokenizer.vocab_size,  # Use tokenizer's actual vocab size
         "avg_train_len": avg_train_len,
         "avg_val_len": avg_val_len,
         "avg_test_len": avg_test_len,

@@ -13,7 +13,9 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.config import get_config
 from utils.tokenizer import PolishTokenizer
+from utils.tokenizer_factory import create_tokenizer
 from models.transformer_model import TransformerLanguageModel
+import json
 
 
 def generate_text(
@@ -56,10 +58,22 @@ def generate_text(
     print(f"Dataset: {dataset}")
     print(f"Device: {config.device}")
 
+    # Load metadata to get tokenizer type
+    metadata_path = config.data_processed_dir / f"{dataset}_metadata.json"
+    with open(metadata_path, "r") as f:
+        metadata = json.load(f)
+        tokenizer_type = metadata.get("tokenizer_type", "bpe")
+
     # Load tokenizer
-    print("\nLoading tokenizer...")
-    tokenizer = PolishTokenizer(vocab_size=config.vocab_size)
-    tokenizer_path = config.data_processed_dir / f"{dataset}_tokenizer.json"
+    print(f"\nLoading tokenizer (type: {tokenizer_type})...")
+    tokenizer = create_tokenizer(tokenizer_type, vocab_size=config.vocab_size)
+
+    # SentencePiece uses .json, others may use different extensions
+    if tokenizer_type == "sentencepiece":
+        tokenizer_path = config.data_processed_dir / f"{dataset}_tokenizer.json"
+    else:
+        tokenizer_path = config.data_processed_dir / f"{dataset}_tokenizer.json"
+
     tokenizer.load(tokenizer_path)
 
     # Load checkpoint
@@ -156,7 +170,6 @@ def generate_text(
     print(f"Results saved to: {results_path}")
 
     # Also save as JSON for programmatic access
-    import json
     json_path = config.results_dir / f"{dataset}_transformer_generations.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, ensure_ascii=False)

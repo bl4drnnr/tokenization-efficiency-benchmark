@@ -50,7 +50,7 @@ class Config:
 
     # Training hyperparameters
     batch_size: int = 32  # Will be optimized based on GPU
-    num_epochs: int = 50  # More epochs for better convergence on large batches
+    num_epochs: int = 25  # More epochs for better convergence on large batches
     learning_rate: float = 3e-4  # Will be adjusted for batch size
     weight_decay: float = 0.01
     gradient_clip: float = 1.0

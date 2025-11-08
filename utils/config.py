@@ -106,8 +106,8 @@ class Config:
             if self.training_env == "cloud":
                 # Cloud GPU optimization (RunPod, Colab, etc.)
                 self.num_workers = 8  # More workers for cloud GPUs
-                if self.batch_size == 32:  # Only increase if using default
-                    self.batch_size = 64  # RTX 5090 has 32GB VRAM
+                if self.batch_size <= 64:  # Only increase if using default/small batch
+                    self.batch_size = 512  # RTX 5090 has 32GB VRAM - use it!
             else:
                 # Local GPU optimization
                 self.num_workers = 4

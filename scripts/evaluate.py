@@ -105,7 +105,8 @@ def evaluate(
         eval_dataset,
         batch_size=config.eval_batch_size,
         shuffle=False,
-        num_workers=0,
+        num_workers=config.num_workers,
+        pin_memory=config.pin_memory,
     )
 
     # Load checkpoint

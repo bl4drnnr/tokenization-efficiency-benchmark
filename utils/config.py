@@ -4,6 +4,7 @@ Supports GPU (CUDA), Apple Silicon (MPS), and CPU training.
 """
 
 import torch
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -30,6 +31,13 @@ class Config:
         else "cpu"
     )
 
+    # Training environment (auto-detect or set via env variable)
+    training_env: str = os.environ.get("TRAINING_ENV", "auto")  # "auto", "local", "cloud"
+
+    # DataLoader optimization
+    num_workers: int = 0  # Will be set based on environment
+    pin_memory: bool = False  # Will be set based on device
+
     # Data processing
     vocab_size: int = 10000  # For whitespace and sentencepiece tokenizers (GPT-2 uses 50,257)
     max_seq_length: int = 128  # Shorter sequences for faster training
@@ -41,11 +49,17 @@ class Config:
     min_frequency: int = 2  # Minimum token frequency to include in vocab
 
     # Training hyperparameters
-    batch_size: int = 32  # Adjust based on available GPU memory
+    batch_size: int = 32  # Will be optimized based on GPU
     num_epochs: int = 20  # Increased from 10 (transformers need more epochs)
     learning_rate: float = 3e-4  # Reduced from 1e-3 (transformers need lower LR)
     weight_decay: float = 0.01
     gradient_clip: float = 1.0
+
+    # Gradient accumulation (for effective larger batch sizes)
+    gradient_accumulation_steps: int = 1  # 1 = no accumulation
+
+    # Mixed precision training (for faster GPU training)
+    use_amp: bool = False  # Will be set based on device
 
     # Learning rate warmup
     warmup_steps: int = 1000  # Warmup for first ~1000 steps
@@ -68,10 +82,45 @@ class Config:
     top_k: int = 50
 
     def __post_init__(self):
-        """Create directories if they don't exist."""
+        """Create directories if they don't exist and optimize settings based on device."""
         self.data_processed_dir.mkdir(parents=True, exist_ok=True)
         self.checkpoints_dir.mkdir(parents=True, exist_ok=True)
         self.results_dir.mkdir(parents=True, exist_ok=True)
+
+        # Auto-detect training environment
+        if self.training_env == "auto":
+            # Check if running in a cloud environment (common indicators)
+            is_cloud = (
+                os.path.exists("/.dockerenv") or  # Docker container
+                os.environ.get("RUNPOD_POD_ID") is not None or  # RunPod
+                os.environ.get("COLAB_GPU") is not None or  # Google Colab
+                os.environ.get("KAGGLE_KERNEL_RUN_TYPE") is not None  # Kaggle
+            )
+            self.training_env = "cloud" if is_cloud else "local"
+
+        # Optimize settings based on device and environment
+        if self.device == "cuda":
+            self.pin_memory = True
+            self.use_amp = True  # Enable mixed precision for NVIDIA GPUs
+
+            if self.training_env == "cloud":
+                # Cloud GPU optimization (RunPod, Colab, etc.)
+                self.num_workers = 8  # More workers for cloud GPUs
+                if self.batch_size == 32:  # Only increase if using default
+                    self.batch_size = 64  # RTX 5090 has 32GB VRAM
+            else:
+                # Local GPU optimization
+                self.num_workers = 4
+        elif self.device == "mps":
+            # Apple Silicon optimization
+            self.pin_memory = False
+            self.num_workers = 0  # MPS works better with single process
+            self.use_amp = False  # AMP not fully supported on MPS
+        else:
+            # CPU fallback
+            self.pin_memory = False
+            self.num_workers = 4
+            self.use_amp = False
 
 
 @dataclass

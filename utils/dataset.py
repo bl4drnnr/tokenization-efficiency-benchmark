@@ -115,6 +115,7 @@ def create_dataloaders(
     max_length: int,
     pad_token_id: int,
     num_workers: int = 0,
+    pin_memory: bool = False,
 ) -> Tuple[DataLoader, DataLoader, DataLoader]:
     """
     Create dataloaders for training, validation, and testing.
@@ -126,7 +127,8 @@ def create_dataloaders(
         batch_size: Batch size
         max_length: Maximum sequence length
         pad_token_id: Padding token ID
-        num_workers: Number of worker processes
+        num_workers: Number of worker processes (use 4-8 for GPU training)
+        pin_memory: Pin memory for faster GPU transfer (set True for CUDA)
 
     Returns:
         train_loader, val_loader, test_loader
@@ -140,7 +142,8 @@ def create_dataloaders(
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
-        pin_memory=False,  # Set to False for Mac
+        pin_memory=pin_memory,
+        persistent_workers=num_workers > 0,  # Keep workers alive between epochs
     )
 
     val_loader = DataLoader(
@@ -148,7 +151,8 @@ def create_dataloaders(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=False,
+        pin_memory=pin_memory,
+        persistent_workers=num_workers > 0,
     )
 
     test_loader = DataLoader(
@@ -156,7 +160,8 @@ def create_dataloaders(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=False,
+        pin_memory=pin_memory,
+        persistent_workers=num_workers > 0,
     )
 
     return train_loader, val_loader, test_loader

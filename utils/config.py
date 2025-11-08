@@ -40,7 +40,7 @@ class Config:
 
     # Data processing
     vocab_size: int = 10000  # For whitespace and sentencepiece tokenizers (GPT-2 uses 50,257)
-    max_seq_length: int = 128  # Shorter sequences for faster training
+    max_seq_length: int = 256  # Increased from 128 for better context (RTX 5090 can handle it)
     train_split: float = 0.85
     val_split: float = 0.10
     test_split: float = 0.05
@@ -132,17 +132,17 @@ class Config:
 class TransformerConfig(Config):
     """Configuration specific to Transformer model."""
 
-    # Model architecture
-    embedding_dim: int = 256
+    # Model architecture (optimized for RTX 5090)
+    embedding_dim: int = 512  # Increased from 256 for better representations
     num_heads: int = 8
-    num_layers: int = 4
-    ff_dim: int = 1024  # Feed-forward dimension
-    dropout: float = 0.2  # Increased from 0.1 for better regularization
+    num_layers: int = 12  # Increased from 4 for deeper model
+    ff_dim: int = 2048  # Increased from 1024 for more capacity
+    dropout: float = 0.3  # Increased for better regularization
 
     # Learning rate scheduler
     scheduler_patience: int = 5  # Increased from 2 for more stability
 
-    # Estimated parameters: ~8-12M
+    # Estimated parameters: ~50-60M (was ~8M)
 
     def __repr__(self):
         return (f"Transformer(layers={self.num_layers}, heads={self.num_heads}, "

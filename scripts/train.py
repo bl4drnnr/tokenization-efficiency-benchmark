@@ -390,6 +390,11 @@ def train(
             }, best_model_path)
             print(f"  Best model saved: {best_model_path}")
 
+        # Save metrics after each epoch (overwrite each time)
+        metrics_path = config.results_dir / f"{dataset}_{tokenizer_type}_transformer_metrics.json"
+        metrics.save(str(metrics_path))
+        print(f"  Metrics updated: {metrics_path}")
+
         # Generate and save plots
         plotter.plot_all_metrics(metrics, epoch, plot_frequency=config.plot_every_n_epochs)
 

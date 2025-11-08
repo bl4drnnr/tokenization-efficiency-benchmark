@@ -50,8 +50,8 @@ class Config:
 
     # Training hyperparameters
     batch_size: int = 32  # Will be optimized based on GPU
-    num_epochs: int = 20  # Increased from 10 (transformers need more epochs)
-    learning_rate: float = 3e-4  # Reduced from 1e-3 (transformers need lower LR)
+    num_epochs: int = 50  # More epochs for better convergence on large batches
+    learning_rate: float = 3e-4  # Will be adjusted for batch size
     weight_decay: float = 0.01
     gradient_clip: float = 1.0
 
@@ -62,7 +62,7 @@ class Config:
     use_amp: bool = False  # Will be set based on device
 
     # Learning rate warmup
-    warmup_steps: int = 1000  # Warmup for first ~1000 steps
+    warmup_steps: int = 2000  # Longer warmup for large batches
 
     # Label smoothing for better generalization
     label_smoothing: float = 0.1
@@ -106,8 +106,13 @@ class Config:
             if self.training_env == "cloud":
                 # Cloud GPU optimization (RunPod, Colab, etc.)
                 self.num_workers = 8  # More workers for cloud GPUs
-                if self.batch_size <= 64:  # Only increase if using default/small batch
-                    self.batch_size = 512  # RTX 5090 has 32GB VRAM - use it!
+                if self.batch_size <= 512:  # Only increase if using default/small batch
+                    self.batch_size = 1024  # RTX 5090 has 32GB VRAM
+                    # Scale learning rate with batch size (linear scaling rule)
+                    # Base LR is for batch_size=32, so scale proportionally
+                    if self.learning_rate == 3e-4:
+                        self.learning_rate = 3e-4 * (self.batch_size / 32)
+                        self.learning_rate = min(self.learning_rate, 1e-3)  # Cap at 1e-3
             else:
                 # Local GPU optimization
                 self.num_workers = 4

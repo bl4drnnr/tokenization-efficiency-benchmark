@@ -194,10 +194,18 @@ def train(
     if config.device == "cuda":
         print(f"GPU: {torch.cuda.get_device_name(0)}")
         print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.2f} GB")
+
+        # Enable TF32 for RTX 30xx/40xx/50xx series (faster matmul)
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        print(f"TF32 enabled: True")
+
     print(f"Mixed precision (AMP): {config.use_amp}")
     print(f"Gradient accumulation steps: {config.gradient_accumulation_steps}")
     print(f"DataLoader workers: {config.num_workers}")
     print(f"Pin memory: {config.pin_memory}")
+    print(f"Batch size: {config.batch_size}")
+    print(f"Learning rate: {config.learning_rate:.6f}")
 
     # Load preprocessed data
     print("\nLoading preprocessed data...")

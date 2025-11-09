@@ -636,23 +636,23 @@ Below are example plots from the trained models:
 
 #### GPT-2 Tokenizer Training
 
-![GPT-2 Loss](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_gpt2_gpt2_transformer_loss_epoch_25.png)
+![GPT-2 Loss](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_gpt2_gpt2_transformer_loss_epoch_25.png)
 
-![GPT-2 Perplexity](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_gpt2_gpt2_transformer_perplexity_epoch_25.png)
+![GPT-2 Perplexity](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_gpt2_gpt2_transformer_perplexity_epoch_25.png)
 
-![GPT-2 Combined Metrics](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_gpt2_gpt2_transformer_combined_metrics_epoch_25.png)
+![GPT-2 Combined Metrics](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_gpt2_gpt2_transformer_combined_metrics_epoch_25.png)
 
 #### SentencePiece Tokenizer Training
 
-![SentencePiece Loss](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_sentencepiece_sentencepiece_transformer_loss_epoch_25.png)
+![SentencePiece Loss](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_sentencepiece_sentencepiece_transformer_loss_epoch_25.png)
 
-![SentencePiece Perplexity](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_sentencepiece_sentencepiece_transformer_perplexity_epoch_25.png)
+![SentencePiece Perplexity](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_sentencepiece_sentencepiece_transformer_perplexity_epoch_25.png)
 
 #### Whitespace Tokenizer Training
 
-![Whitespace Loss](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_whitespace_whitespace_transformer_loss_epoch_25.png)
+![Whitespace Loss](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_whitespace_whitespace_transformer_loss_epoch_25.png)
 
-![Whitespace Perplexity](results/plots/forum_forum_poradnikogrodniczy_pl_corpus_whitespace_whitespace_transformer_perplexity_epoch_25.png)
+![Whitespace Perplexity](./results/plots/forum_forum_poradnikogrodniczy_pl_corpus_whitespace_whitespace_transformer_perplexity_epoch_25.png)
 
 ### Manual Visualization
 

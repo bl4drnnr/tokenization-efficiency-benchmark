@@ -1,0 +1,65 @@
+{
+  "gpt2": {
+    "tokenizer_type": "gpt2",
+    "vocab_size": 50257,
+    "word_level_perplexity": 640.4983643919887,
+    "character_level_perplexity": 3.3193542902092474,
+    "oov_statistics": {
+      "oov_words": 0,
+      "total_words": 0,
+      "oov_percentage": 0.0
+    },
+    "tokens_per_word": 3.431127330989363,
+    "words_encoded_directly": {
+      "direct_words": 5468,
+      "total_words": 22469,
+      "percentage": 24.335751479816636
+    },
+    "inference_speed_tokens_per_sec": 11694.02505610503,
+    "training_time_total_seconds": 15150.821994543076,
+    "training_time_avg_epoch_seconds": 606.0328797817231,
+    "best_val_perplexity_token_level": 30.94770256015369
+  },
+  "sentencepiece": {
+    "tokenizer_type": "sentencepiece",
+    "vocab_size": 10000,
+    "word_level_perplexity": 480.61686304436944,
+    "character_level_perplexity": 3.131258619828048,
+    "oov_statistics": {
+      "oov_words": 0,
+      "total_words": 0,
+      "oov_percentage": 0.0
+    },
+    "tokens_per_word": 1.529618585606836,
+    "words_encoded_directly": {
+      "direct_words": 15132,
+      "total_words": 22469,
+      "percentage": 67.3461213227113
+    },
+    "inference_speed_tokens_per_sec": 5941.56031861402,
+    "training_time_total_seconds": 25160.846922397614,
+    "training_time_avg_epoch_seconds": 1006.4338768959045,
+    "best_val_perplexity_token_level": 154.57780871695505
+  },
+  "whitespace": {
+    "tokenizer_type": "whitespace",
+    "vocab_size": 10000,
+    "word_level_perplexity": 139.8333840884686,
+    "character_level_perplexity": 2.4923376748104857,
+    "oov_statistics": {
+      "oov_words": 2212,
+      "total_words": 22469,
+      "oov_percentage": 9.844674885397659
+    },
+    "tokens_per_word": 1.2031688103609417,
+    "words_encoded_directly": {
+      "direct_words": 16686,
+      "total_words": 22469,
+      "percentage": 74.26231697004762
+    },
+    "inference_speed_tokens_per_sec": 5351.213819188374,
+    "training_time_total_seconds": 11262.142377853394,
+    "training_time_avg_epoch_seconds": 450.48569511413575,
+    "best_val_perplexity_token_level": 109.56858331540155
+  }
+}

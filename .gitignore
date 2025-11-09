@@ -29,16 +29,11 @@ checkpoints/*.pth
 *.model
 
 # Results
-results/*.txt
-results/*.png
-results/*.json
 results/*.csv
 results/plots/*.png
 
 CLAUDE.md
 .claude/
 speakleash_datasets_metadata/*
-LAB_INSTRUCTIONS.md
-PREVIOUS_README.md
 
 

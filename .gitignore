@@ -30,7 +30,6 @@ checkpoints/*.pth
 
 # Results
 results/*.csv
-results/plots/*.png
 
 CLAUDE.md
 .claude/

@@ -1,0 +1,130 @@
+QUALITATIVE TOKENIZATION ANALYSIS
+================================================================================
+
+
+================================================================================
+GPT2 TOKENIZER
+================================================================================
+
+--- Sample 1 ---
+Original text (29 words):
+  "Uprawa pomidorów w ogrodzie wymaga odpowiedniego przygotowania gleby, regularnego podlewania oraz stosowania nawozów organicznych. Najlepsze wyniki uzyskuje się sadząc rośliny w miejscach nasłonecznionych, gdzie panuje stały dostęp do wody."
+
+Tokenized (113 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ...]
+
+Statistics:
+  - Tokens per word: 3.90
+  - Words encoded directly: 3/29 (10.3%)
+
+--- Sample 2 ---
+Original text (36 words):
+  "Ogórki gruntowe powinny być uprawiane w glebie zasobnej w próchnicę, o odczynie lekko kwaśnym. Wysiew nasion przeprowadza się pod koniec maja, gdy temperatura gleby osiągnie co najmniej 15 stopni Celsjusza. Regularnie podlewaj rośliny rano lub wieczorem."
+
+Tokenized (116 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ...]
+
+Statistics:
+  - Tokens per word: 3.22
+  - Words encoded directly: 7/36 (19.4%)
+
+--- Sample 3 ---
+Original text (33 words):
+  "Witam wszystkich na forum ogrodniczym! Mam pytanie dotyczące uprawy papryki w tunelu foliowym. Czy ktoś z Was ma doświadczenie z odmianami papryki słodkiej? Proszę o porady i wskazówki dla początkujących ogrodników. Pozdrawiam serdecznie!"
+
+Tokenized (118 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ...]
+
+Statistics:
+  - Tokens per word: 3.58
+  - Words encoded directly: 9/33 (27.3%)
+
+================================================================================
+SENTENCEPIECE TOKENIZER
+================================================================================
+
+--- Sample 1 ---
+Original text (29 words):
+  "Uprawa pomidorów w ogrodzie wymaga odpowiedniego przygotowania gleby, regularnego podlewania oraz stosowania nawozów organicznych. Najlepsze wyniki uzyskuje się sadząc rośliny w miejscach nasłonecznionych, gdzie panuje stały dostęp do wody."
+
+Tokenized (44 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ?]
+
+Statistics:
+  - Tokens per word: 1.52
+  - Words encoded directly: 17/29 (58.6%)
+
+--- Sample 2 ---
+Original text (36 words):
+  "Ogórki gruntowe powinny być uprawiane w glebie zasobnej w próchnicę, o odczynie lekko kwaśnym. Wysiew nasion przeprowadza się pod koniec maja, gdy temperatura gleby osiągnie co najmniej 15 stopni Celsjusza. Regularnie podlewaj rośliny rano lub wieczorem."
+
+Tokenized (62 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ...]
+
+Statistics:
+  - Tokens per word: 1.72
+  - Words encoded directly: 21/36 (58.3%)
+
+--- Sample 3 ---
+Original text (33 words):
+  "Witam wszystkich na forum ogrodniczym! Mam pytanie dotyczące uprawy papryki w tunelu foliowym. Czy ktoś z Was ma doświadczenie z odmianami papryki słodkiej? Proszę o porady i wskazówki dla początkujących ogrodników. Pozdrawiam serdecznie!"
+
+Tokenized (43 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ?]
+
+Statistics:
+  - Tokens per word: 1.30
+  - Words encoded directly: 26/33 (78.8%)
+
+================================================================================
+WHITESPACE TOKENIZER
+================================================================================
+
+--- Sample 1 ---
+Original text (29 words):
+  "Uprawa pomidorów w ogrodzie wymaga odpowiedniego przygotowania gleby, regularnego podlewania oraz stosowania nawozów organicznych. Najlepsze wyniki uzyskuje się sadząc rośliny w miejscach nasłonecznionych, gdzie panuje stały dostęp do wody."
+
+Tokenized (33 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ?]
+
+Statistics:
+  - Tokens per word: 1.14
+  - Words encoded directly: 24/29 (82.8%)
+
+--- Sample 2 ---
+Original text (36 words):
+  "Ogórki gruntowe powinny być uprawiane w glebie zasobnej w próchnicę, o odczynie lekko kwaśnym. Wysiew nasion przeprowadza się pod koniec maja, gdy temperatura gleby osiągnie co najmniej 15 stopni Celsjusza. Regularnie podlewaj rośliny rano lub wieczorem."
+
+Tokenized (41 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ?]
+
+Statistics:
+  - Tokens per word: 1.14
+  - Words encoded directly: 28/36 (77.8%)
+
+--- Sample 3 ---
+Original text (33 words):
+  "Witam wszystkich na forum ogrodniczym! Mam pytanie dotyczące uprawy papryki w tunelu foliowym. Czy ktoś z Was ma doświadczenie z odmianami papryki słodkiej? Proszę o porady i wskazówki dla początkujących ogrodników. Pozdrawiam serdecznie!"
+
+Tokenized (38 tokens):
+  [? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ? | ?]
+
+Statistics:
+  - Tokens per word: 1.15
+  - Words encoded directly: 27/33 (81.8%)
+
+================================================================================
+COMPARISON TABLE
+================================================================================
+
+Sample     Tokenizer       Words    Tokens   Tok/Word   Direct %  
+--------------------------------------------------------------------------------
+#1         gpt2            29       113      3.90       10.3      %
+#1         sentencepiece   29       44       1.52       58.6      %
+#1         whitespace      29       33       1.14       82.8      %
+#2         gpt2            36       116      3.22       19.4      %
+#2         sentencepiece   36       62       1.72       58.3      %
+#2         whitespace      36       41       1.14       77.8      %
+#3         gpt2            33       118      3.58       27.3      %
+#3         sentencepiece   33       43       1.30       78.8      %
+#3         whitespace      33       38       1.15       81.8      %
